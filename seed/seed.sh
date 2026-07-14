@@ -1,5 +1,9 @@
 #!/bin/bash
-# periodico3 - One-shot WordPress bootstrap (Editorial theme, magazine style)
+# periodico3 - One-shot WordPress bootstrap (Editorial theme, blog-style home)
+#
+# Estrategia: show_on_front=posts (home = últimos posts).
+# NO usamos page-as-front + magazine template (eso causaba 301 loop en WP 6.7).
+# Editorial theme provee un look magazine-style de forma nativa.
 set -e
 
 DB_HOST="${WORDPRESS_DB_HOST:-127.0.0.1}"
@@ -31,9 +35,9 @@ if ! wp --path=/var/www/html core is-installed --allow-root 2>/dev/null; then
   echo "==> Installing WordPress core"
   wp --path=/var/www/html core install \
     --url="${WP_SITEURL:-https://periodico3.statusloop.app}" \
-    --title="${WP_TITLE:-Periodico2}" \
+    --title="${WP_TITLE:-Periodico3}" \
     --admin_user="${WP_ADMIN_USER:-admin}" \
-    --admin_password="${WP_ADMIN_PASSWORD}" \
+    --admin_password="${WP_ADMIN_PASSWORD:-P3r10d1c03_Adm1n_2026!}" \
     --admin_email="${WP_ADMIN_EMAIL:-admin@periodico3.statusloop.app}" \
     --skip-email --allow-root
 else
@@ -49,17 +53,16 @@ wp --path=/var/www/html option update start_of_week "1" --allow-root
 wp --path=/var/www/html option update posts_per_page "10" --allow-root
 wp --path=/var/www/html option update default_comment_status "open" --allow-root
 
+# *** CLAVE: home = últimos posts (NO página estática) ***
+# Esto evita el redirect loop 301 que producía show_on_front=page + magazine template
+wp --path=/var/www/html option update show_on_front "posts" --allow-root
+wp --path=/var/www/html option update page_on_front "0" --allow-root
+
 echo "==> Permalinks"
 wp --path=/var/www/html rewrite structure "/%postname%/" --allow-root
 wp --path=/var/www/html rewrite flush --hard --allow-root
 
 echo "==> Editorial theme (magazine style by Mystery Themes)"
-# Editorial es un theme magazine gratuito muy completo de WP.org:
-# - Featured slider (bxslider)
-# - News ticker
-# - Multi-column grid layouts por categoría
-# - Page builder via widgets
-# - Top header con fecha + social icons
 if ! wp --path=/var/www/html theme is-installed editorial --allow-root 2>/dev/null; then
   echo "  Instalando Editorial..."
   wp --path=/var/www/html theme install editorial --allow-root 2>&1 | tail -3
@@ -67,25 +70,17 @@ fi
 wp --path=/var/www/html theme activate editorial --allow-root 2>&1 | tail -1
 
 echo "==> Editorial theme options (customizer)"
-# Top header
 wp --path=/var/www/html option update editorial_top_header_option "enable" --allow-root
 wp --path=/var/www/html option update editorial_social_icons_option "enable" --allow-root
-# News ticker
 wp --path=/var/www/html option update editorial_ticker_option "enable" --allow-root
 wp --path=/var/www/html option update editorial_ticker_caption "Última Hora" --allow-root
-# Single post layout
 wp --path=/var/www/html option update editorial_single_page_layout "right_sidebar" --allow-root
-# Copyright
-wp --path=/var/www/html option update editorial_copyright_text "© 2026 Periodico2 — Todos los derechos reservados" --allow-root
-# Color primario del theme (lo deja en rojo periodístico por defecto)
-# Editorial no expone color primario directo en options; lo manejamos via CSS
+wp --path=/var/www/html option update editorial_copyright_text "© 2026 Periodico3 — Todos los derechos reservados" --allow-root
 
-echo "==> Custom CSS (Editorial - ajustes Public Opinion style)"
-# Editorial ya es un theme magazine-style. Solo ajustamos paleta y tipografía
-# para acercarlo al look de Public Opinion de CSSIgniter.
+echo "==> Custom CSS (Editorial - Public Opinion look)"
 wp --path=/var/www/html option update periodico3_custom_css "$(cat /seed/custom.css)" --allow-root
 
-# mu-plugin para inyectar CSS
+# mu-plugin: inyecta CSS + defensivo contra redirect_canonical loop
 mkdir -p /var/www/html/wp-content/mu-plugins
 cat > /var/www/html/wp-content/mu-plugins/periodico3-custom-css.php <<'MUPLUGIN'
 <?php
@@ -100,26 +95,16 @@ add_action('wp_head', function() {
     }
 }, 99);
 
-// FIX: deshabilitar redirect_canonical para evitar loop 301 en la home
-// cuando show_on_front=page y page_on_front es una página Magazine.
-// WordPress 6.7 + Magazine template genera redirect_canonical() que
-// produce 301 → 301 → ... en la URL raíz. Este filter corta ese loop.
+// Defensivo: si WP 6.7 hace loop de redirect_canonical en la home,
+// cortamos el loop retornando false cuando canonical == requested.
 add_filter('redirect_canonical', function($redirect_url, $requested_url) {
-    // Si la canonical es la misma URL que se pidió, no redirigir
     if (rtrim($redirect_url, '/') === rtrim($requested_url, '/')) {
         return false;
     }
     return $redirect_url;
 }, 10, 2);
-
-// Asegurar que la home apunte a la página Magazine
-add_action('init', function() {
-    $front = get_option('show_on_front');
-    if ($front !== 'page') {
-        update_option('show_on_front', 'page');
-    }
-});
 MUPLUGIN
+echo "  mu-plugin instalado"
 
 echo "==> Essential plugins"
 for PLUGIN in akismet contact-form-7 classic-editor seo-by-rank-math; do
@@ -159,66 +144,26 @@ if [ -n "$EXISTING_ITEMS" ]; then
 fi
 # Items
 timeout 10 wp --path=/var/www/html menu item add-custom "Menú Principal" "Inicio" "/" --allow-root 2>&1 | tail -1
-for SLUG in politica economia mundo tecnologia deportes cultura opinion estilo; do
+for SLUG in "${!SECTIONS[@]}"; do
   CAT_ID=$(wp --path=/var/www/html term list category --slug="$SLUG" --field=term_id --allow-root 2>/dev/null | head -1)
   if [ -n "$CAT_ID" ]; then
-    LABEL=$(echo "${SECTIONS[$SLUG]}")
+    LABEL="${SECTIONS[$SLUG]}"
     timeout 10 wp --path=/var/www/html menu item add-custom \
       "Menú Principal" "$LABEL" "/category/$SLUG/" --allow-root 2>&1 | tail -1
   fi
 done
 
-# Top header menu (fecha + social icons los pone el theme automáticamente)
-if ! wp --path=/var/www/html menu list --allow-root 2>/dev/null | grep -q "Menú Superior"; then
-  wp --path=/var/www/html menu create "Menú Superior" --allow-root 2>&1 | tail -1
-fi
-EXISTING_TOP=$(timeout 10 wp --path=/var/www/html menu item list "Menú Superior" --field=db_id --format=ids --allow-root 2>/dev/null | head -20)
-if [ -n "$EXISTING_TOP" ]; then
-  for ITEM_ID in $EXISTING_TOP; do
-    [ -n "$ITEM_ID" ] && timeout 5 wp --path=/var/www/html menu item delete "$ITEM_ID" --allow-root 2>/dev/null
-  done
-fi
-timeout 10 wp --path=/var/www/html menu item add-custom "Menú Superior" "Acerca de" "/acerca-de/" --allow-root 2>&1 | tail -1
-timeout 10 wp --path=/var/www/html menu item add-custom "Menú Superior" "Contacto" "/contacto/" --allow-root 2>&1 | tail -1
-
-# Asignar menus via PHP (Editorial usa locations: primary, top-header, footer)
+# Asignar menu via PHP (Editorial usa locations: primary, top-header, footer)
 MENU_ID=$(wp --path=/var/www/html menu list --fields=term_id,name --allow-root 2>/dev/null | awk -F'|' '/Menú Principal/ {gsub(/ /,"",$1); print $1; exit}')
-MENU_TOP_ID=$(wp --path=/var/www/html menu list --fields=term_id,name --allow-root 2>/dev/null | awk -F'|' '/Menú Superior/ {gsub(/ /,"",$1); print $1; exit}')
-if [ -n "$MENU_ID" ] || [ -n "$MENU_TOP_ID" ]; then
-  echo "==> Asignando menus via PHP (primary=$MENU_ID, top-header=$MENU_TOP_ID)"
-  PRIMARY_MENU=$MENU_ID TOP_MENU=$MENU_TOP_ID wp --path=/var/www/html eval-file /seed/assign_menu.php --allow-root 2>&1 | tail -10
+if [ -n "$MENU_ID" ]; then
+  echo "==> Asignando menu $MENU_ID via PHP"
+  PRIMARY_MENU=$MENU_ID wp --path=/var/www/html eval-file /seed/assign_menu.php --allow-root 2>&1 | tail -5
 fi
 
 # Borrar Sample Page y Hello World
 SAMPLE_ID=$(wp --path=/var/www/html post list --post_type=page --name="sample-page" --field=ID --allow-root 2>/dev/null | head -1)
 [ -n "$SAMPLE_ID" ] && wp --path=/var/www/html post delete "$SAMPLE_ID" --force --allow-root 2>&1 | tail -1
 wp --path=/var/www/html post delete 1 --force --allow-root 2>/dev/null || true
-
-# Crear página Magazine para el home
-MAG_ID=$(wp --path=/var/www/html post list --post_type=page --name=inicio --field=ID --allow-root 2>/dev/null | head -1)
-if [ -z "$MAG_ID" ]; then
-  echo "==> Creando página 'Inicio' con template Magazine"
-  MAG_ID=$(wp --path=/var/www/html post create \
-    --post_type=page \
-    --post_status=publish \
-    --post_title="Inicio" \
-    --post_name="inicio" \
-    --post_content="" \
-    --porcelain \
-    --allow-root 2>/dev/null | head -1) || true
-fi
-# Borrar página Blog default
-BLOG_ID=$(wp --path=/var/www/html post list --post_type=page --name=blog --field=ID --allow-root 2>/dev/null | head -1)
-[ -n "$BLOG_ID" ] && [ "$BLOG_ID" != "$MAG_ID" ] && wp --path=/var/www/html post delete "$BLOG_ID" --force --allow-root 2>&1 | tail -1
-
-# Asignar home = Magazine
-wp --path=/var/www/html option update show_on_front "page" --allow-root
-wp --path=/var/www/html option update page_on_front "$MAG_ID" --allow-root
-wp --path=/var/www/html option update page_for_posts 0 --allow-root
-
-echo "==> Magazine widgets (slider + grids + sidebar)"
-MAG_WIDGETS_OUT=$(MAG_ID=$MAG_ID wp --path=/var/www/html eval-file /seed/magazine_widgets.php --allow-root 2>&1)
-echo "$MAG_WIDGETS_OUT" | tail -10
 
 # Frontmatter parser
 parse_frontmatter() {
@@ -242,6 +187,7 @@ parse_categories() {
 echo "==> Sample articles"
 EXISTING=$(wp --path=/var/www/html post list --post_type=post --post_status=publish --format=count --allow-root 2>/dev/null | tr -d ' ')
 if [ "${EXISTING:-0}" -lt 6 ]; then
+  # Borrar todos los posts existentes (los helloworld, etc)
   wp --path=/var/www/html post delete $(wp --path=/var/www/html post list --post_type=post --post_status=publish --format=ids --allow-root 2>/dev/null) --force --allow-root 2>/dev/null || true
 
   for FILE in /seed/articles/*.md; do
@@ -291,4 +237,3 @@ fi
 
 echo "==> ✓ Bootstrap done"
 wp --path=/var/www/html post list --post_type=post --post_status=publish --format=count --allow-root
-wp --path=/var/www/html post list --post_type=page --post_status=publish --format=count --allow-root
