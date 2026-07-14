@@ -1,0 +1,403 @@
+/* ==========================================================================
+   periodico3 - Public Opinion style custom CSS sobre Editorial (Mystery Themes)
+   ========================================================================== */
+
+:root {
+    --po-dark: #1a1a1a;
+    --po-darker: #0d0d0d;
+    --po-red: #c0392b;
+    --po-red-dark: #a93226;
+    --po-gray: #f5f5f5;
+    --po-text: #2c3e50;
+    --po-border: #e5e5e5;
+}
+
+/* ---------- Top Header (negro) ---------- */
+.site-header .top-header-section {
+    background: var(--po-dark) !important;
+    color: #fff !important;
+    padding: 8px 0 !important;
+    font-size: 13px !important;
+}
+.site-header .top-header-section .top-left-header,
+.site-header .top-header-section .top-navigation ul,
+.site-header .top-header-section .top-navigation ul li a,
+.site-header .top-header-section a {
+    color: #ddd !important;
+    text-decoration: none !important;
+}
+.site-header .top-header-section a:hover {
+    color: var(--po-red) !important;
+}
+.site-header .top-header-section .social-icons a {
+    color: #fff !important;
+    margin-left: 12px !important;
+}
+.site-header .top-header-section .social-icons a:hover {
+    color: var(--po-red) !important;
+}
+
+/* ---------- Logo + branding ---------- */
+.site-header .logo-ads-wrapper {
+    background: #fff !important;
+    padding: 28px 0 !important;
+    border-bottom: 3px solid var(--po-red) !important;
+}
+.site-header .site-branding .site-title {
+    font-family: 'Georgia', 'Times New Roman', serif !important;
+    font-size: 48px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    margin: 0 !important;
+}
+.site-header .site-branding .site-title a {
+    color: var(--po-dark) !important;
+    text-transform: none !important;
+}
+.site-header .site-branding .site-title a:hover {
+    color: var(--po-red) !important;
+}
+.site-header .site-branding .site-description {
+    color: #777 !important;
+    font-style: italic !important;
+    font-size: 14px !important;
+    margin-top: 6px !important;
+    font-family: 'Georgia', serif !important;
+}
+
+/* ---------- Menu principal (negro) ---------- */
+.site-header .bottom-header-wrapper,
+#mt-menu-wrap {
+    background: var(--po-darker) !important;
+    border-top: 1px solid #333 !important;
+    border-bottom: 3px solid var(--po-red) !important;
+    padding: 0 !important;
+}
+.site-header .bottom-header-wrapper .mt-container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+.main-navigation ul li a,
+.site-header .bottom-header-wrapper #site-navigation ul li a {
+    color: #fff !important;
+    font-family: 'Helvetica', 'Arial', sans-serif !important;
+    text-transform: uppercase !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    padding: 18px 14px !important;
+    transition: all 0.2s !important;
+}
+.main-navigation ul li a:hover,
+.site-header .bottom-header-wrapper #site-navigation ul li a:hover,
+.main-navigation ul li.current-menu-item a,
+.main-navigation ul li.current_page_item a {
+    background: var(--po-red) !important;
+    color: #fff !important;
+}
+.home-icon a, .menu-toggle {
+    color: #fff !important;
+}
+.home-icon a:hover {
+    color: var(--po-red) !important;
+}
+.header-search-wrapper .search-main a {
+    color: #fff !important;
+}
+
+/* ---------- News Ticker (rojo) ---------- */
+.editorial-ticker-wrapper {
+    background: var(--po-red-dark) !important;
+    color: #fff !important;
+    padding: 0 !important;
+    border-bottom: 0 !important;
+}
+.editorial-ticker-wrapper .ticker-caption {
+    background: #7b241c !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    padding: 12px 18px !important;
+    font-size: 13px !important;
+    letter-spacing: 0.5px !important;
+    border-right: 0 !important;
+    position: relative !important;
+}
+.editorial-ticker-wrapper .ticker-caption::after {
+    content: '';
+    position: absolute;
+    right: -12px;
+    top: 0;
+    width: 0;
+    height: 0;
+    border-left: 12px solid #7b241c;
+    border-top: 22px solid transparent;
+    border-bottom: 22px solid transparent;
+}
+.editorial-ticker-wrapper .ticker-content-wrapper {
+    background: var(--po-red-dark) !important;
+    color: #fff !important;
+    padding: 12px 18px !important;
+}
+.editorial-ticker-wrapper .ticker-content-wrapper a,
+.editorial-ticker-wrapper #mt-newsTicker li a {
+    color: #fff !important;
+    font-weight: 500 !important;
+}
+.editorial-ticker-wrapper .ticker-content-wrapper a:hover {
+    color: #ffd5d0 !important;
+}
+
+/* ---------- Featured slider section ---------- */
+.featured-slider-section {
+    padding: 30px 0 !important;
+    background: var(--po-gray) !important;
+}
+.bx-wrapper .bx-caption {
+    background: rgba(26, 26, 26, 0.85) !important;
+}
+.bx-wrapper .editorial_slider_title a,
+.editorial_slider_title {
+    color: #fff !important;
+    font-family: 'Georgia', serif !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+.editorial_featured_slider .featured-posts-wrapper {
+    background: #fff !important;
+    border: 1px solid var(--po-border) !important;
+}
+
+/* ---------- Block layout (grids por categoría) ---------- */
+.home-content-wrapper {
+    padding: 30px 0 !important;
+}
+.home-primary-wrapper {
+    width: 68% !important;
+    float: left !important;
+    padding-right: 30px !important;
+    box-sizing: border-box !important;
+}
+.home-secondary-wrapper {
+    width: 32% !important;
+    float: right !important;
+    box-sizing: border-box !important;
+}
+
+.block-layout-wrapper {
+    background: #fff !important;
+    margin-bottom: 40px !important;
+    border-bottom: 2px solid var(--po-border) !important;
+    padding-bottom: 20px !important;
+}
+.block-header {
+    border-bottom: 2px solid var(--po-dark) !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 10px !important;
+    position: relative !important;
+}
+.block-header::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background: var(--po-red);
+}
+.block-header .block-title,
+.widget .widget-title,
+.editorial_block_title {
+    font-family: 'Georgia', serif !important;
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    color: var(--po-dark) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.block-header .block-title a,
+.widget-title a {
+    color: var(--po-dark) !important;
+}
+.block-header .block-title a:hover,
+.widget-title a:hover {
+    color: var(--po-red) !important;
+}
+
+/* Layouts de los grids */
+.editorial_block_layout .post-title,
+.editorial_block_layout h3.post-title {
+    font-family: 'Georgia', serif !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    margin: 10px 0 !important;
+}
+.editorial_block_layout .post-title a {
+    color: var(--po-dark) !important;
+}
+.editorial_block_layout .post-title a:hover {
+    color: var(--po-red) !important;
+}
+
+/* Etiquetas de categoría */
+.cat-links a,
+.editorial_block_layout .post-categories a,
+.editorial_block_layout .cat-links a,
+.editorial_block_layout .post-category a {
+    background: var(--po-red) !important;
+    color: #fff !important;
+    padding: 3px 10px !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    display: inline-block !important;
+    border-radius: 0 !important;
+    text-decoration: none !important;
+}
+.cat-links a:hover,
+.editorial_block_layout .post-categories a:hover {
+    background: var(--po-dark) !important;
+}
+
+/* Botón "Read More" */
+.btn-more,
+.editorial_block_layout .read-more,
+.editorial_block_layout a.read-more {
+    background: var(--po-dark) !important;
+    color: #fff !important;
+    padding: 8px 16px !important;
+    text-transform: uppercase !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px !important;
+    border-radius: 0 !important;
+    display: inline-block !important;
+    text-decoration: none !important;
+}
+.btn-more:hover,
+.editorial_block_layout .read-more:hover {
+    background: var(--po-red) !important;
+}
+
+/* ---------- Sidebar (home) ---------- */
+.home-secondary-wrapper .widget {
+    background: #fff !important;
+    margin-bottom: 30px !important;
+    padding: 20px !important;
+    border-top: 2px solid var(--po-dark) !important;
+}
+.home-secondary-wrapper .widget-title {
+    font-size: 18px !important;
+    border-bottom: 1px solid var(--po-border) !important;
+    padding-bottom: 10px !important;
+    margin-bottom: 15px !important;
+}
+.home-secondary-wrapper .widget_recent_entries ul li,
+.home-secondary-wrapper .widget ul li {
+    border-bottom: 1px dashed var(--po-border) !important;
+    padding: 10px 0 !important;
+    list-style: none !important;
+}
+.home-secondary-wrapper .widget_recent_entries ul li a,
+.home-secondary-wrapper .widget ul li a {
+    color: var(--po-text) !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+}
+.home-secondary-wrapper .widget_recent_entries ul li a:hover,
+.home-secondary-wrapper .widget ul li a:hover {
+    color: var(--po-red) !important;
+}
+.home-secondary-wrapper .post-date,
+.home-secondary-wrapper .entry-date {
+    color: #999 !important;
+    font-size: 12px !important;
+    font-style: italic !important;
+}
+
+/* ---------- Footer ---------- */
+.site-footer,
+.footer-bottom-wrapper {
+    background: var(--po-darker) !important;
+    color: #aaa !important;
+    padding: 40px 0 0 0 !important;
+}
+.site-footer .widget,
+.site-footer .widget-title,
+.site-footer a {
+    color: #ddd !important;
+}
+.site-footer .widget-title {
+    color: #fff !important;
+    text-transform: uppercase !important;
+    border-bottom: 1px solid #333 !important;
+    padding-bottom: 10px !important;
+}
+.site-footer a:hover {
+    color: var(--po-red) !important;
+}
+.footer-copyright,
+.copyright {
+    background: #000 !important;
+    color: #999 !important;
+    text-align: center !important;
+    padding: 20px 0 !important;
+    border-top: 2px solid var(--po-red) !important;
+}
+
+/* ---------- Single post / archive ---------- */
+.single .entry-title,
+.archive .page-header h1,
+.page .entry-title {
+    font-family: 'Georgia', serif !important;
+    font-weight: 700 !important;
+    color: var(--po-dark) !important;
+    line-height: 1.3 !important;
+}
+.entry-meta,
+.posted-on,
+.byline {
+    color: #888 !important;
+    font-size: 13px !important;
+    font-style: italic !important;
+}
+.entry-content {
+    font-family: 'Georgia', serif !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    color: #333 !important;
+}
+.entry-content p {
+    margin-bottom: 18px !important;
+}
+
+/* ---------- Responsive (mobile) ---------- */
+@media (max-width: 768px) {
+    .home-primary-wrapper,
+    .home-secondary-wrapper {
+        width: 100% !important;
+        float: none !important;
+        padding: 0 !important;
+    }
+    .site-header .site-branding .site-title {
+        font-size: 32px !important;
+        text-align: center !important;
+    }
+    .site-header .logo-ads-wrapper .mt-container {
+        text-align: center !important;
+    }
+    .menu-toggle {
+        color: #fff !important;
+        padding: 14px 18px !important;
+        font-size: 20px !important;
+    }
+    .main-navigation ul li a {
+        padding: 12px 18px !important;
+    }
+}
